@@ -1,38 +1,33 @@
-import React, { createContext } from 'react';
-import { getAuth } from 'firebase/auth';
+import React, { createContext, useEffect, useState } from 'react';
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import Spinner from '../../Pages/Spinner/Spinner';
+import app from '../../Firebase/firebase.config';
 
 export const AuthContext = createContext();
 const auth = getAuth(app);
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const GProvider = new GoogleAuthProvider();
 
-    // Creating User 
+    // Creating User
     const createUser = (email, password) => {
         setLoading(true);
         return createUserWithEmailAndPassword(auth, email, password);
     };
 
-    // Sign in Email 
+    // Sign in Email
     const logIn = (email, password) => {
         setLoading(true);
         return signInWithEmailAndPassword(auth, email, password);
     };
 
-    // Sign in with Google 
-    const GSignIn = () => {
-        setLoading(true);
-        return signInWithPopup(auth, GProvider);
-    }
-
-    // Sign Out 
+    // Sign Out
     const logOut = () => {
         setLoading(true);
         return signOut(auth);
     }
 
-    // Observer 
+    // Observer
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
             setUser(currentUser);
@@ -53,7 +48,6 @@ const AuthProvider = ({ children }) => {
         setLoading,
         createUser,
         logIn,
-        GSignIn,
         logOut
     }
     return (

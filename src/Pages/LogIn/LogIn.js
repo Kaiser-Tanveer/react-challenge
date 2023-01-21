@@ -1,66 +1,63 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { FaGoogle, FaUserCircle } from 'react-icons/fa';
-import { useForm } from 'react-hook-form';
+import React from 'react';
+import { useContext } from 'react';
+import { FaUserCircle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../Contexts/AuthContext/AuthProvider';
 
 const LogIn = () => {
+    const { logIn } = useContext(AuthContext);
     const navigate = useNavigate();
+    const submitHandler = e => {
+        e.preventDefault();
+        const form = e.target;
+        const name = form.name.value;
+        const email = form.email.value;
+        const password = form.password.value;
+        console.log(name, email, password);
+        form.value = '';
 
-    const [formError, setFormError] = useState('');
-
-    const { logIn, GSignIn } = useContext(AuthContext);
-    const { register, formState: { errors }, handleSubmit } = useForm();
-    const submitHandler = data => {
-        logIn(data.email, data.password)
+        logIn(email, password)
             .then(result => {
                 const user = result.user;
                 console.log(user);
-                toast.success('Logged In Successfully!');
                 navigate('/');
             })
-            .then(err => {
-                console.log(err);
-                setFormError(err.message);
-            })
-    }
-
-    const googleLogIn = () => {
-        GSignIn()
-            .then(result => {
-                const user = result.user;
-                console.log(user);
-                toast.success('Logged in with Google Successfully!');
-                navigate('/');
-            })
-            .then(err => {
-                console.error(err);
-            })
+            .catch(err => console.error(err))
     }
     return (
-        <form onSubmit={handleSubmit(submitHandler)} className="mx-auto bg-info card my-5 p-4 shadow-lg" style={{ width: "360px" }}>
-            <FaUserCircle className='fs-1 mx-auto rounded-circle shadow' />
-            <h2 className='text-warning fw-bold fs-bold text-center'>Login</h2>
-            <label>Your Email</label>
-            <input
-                {...register("email", { required: "Email is required." })}
-                type="text" className="rounded p-2 fw-semibold border-info" required />
-            {errors.email && <p className='text-error'>{errors.email.message}</p>}
-            <label>Password</label>
-            <input
-                {...register("password", { required: "Password is required.", pattern: { value: '/(?=.*[a-z])(?=.*[A-Z])/', message: 'Password must contain uppercase and lowercase' } })}
-                type="password" className="rounded p-2 fw-semibold border-info" required />
-            {errors.password && <p className='text-error'>{errors.password.message}</p>}
-            <button type="submit" className="mx-auto w-100 btn btn-warning fs-semibold rounded shadow mt-4">Login</button>
-            {
-                formError &&
-                <p className='text-danger my-2'>{formError}</p>
-            }
-            <div className="mt-2">
-                <p className="text-gray-600">New in EduShop? Please <Link to='/register'>Register</Link></p>
+        <form onSubmit={submitHandler} className='w-96 mx-auto my-20 p-5 shadow-lg rounded-lg shadow-gray-400 border'>
+            <FaUserCircle className='text-6xl mx-auto shadow-lg rounded-full' />
+            <h2 className='text-4xl text-center font-bold'>Login</h2>
+            <div className="form-control">
+                <label className="label">
+                    <span className="label-text">Your Name</span>
+                </label>
+                <label className="input-group">
+                    <span className='bg-info'>Name</span>
+                    <input type="text" name='name' placeholder="Your Name" className="input input-bordered w-full" />
+                </label>
+            </div><div className="form-control">
+                <label className="label">
+                    <span className="label-text">Your Email</span>
+                </label>
+                <label className="input-group">
+                    <span className='bg-info'>Email</span>
+                    <input type="email" name='email' placeholder="Your Email" className="input input-bordered w-full" />
+                </label>
             </div>
-            <h4 className='fs-semibold mt-6 text-center'>Sign in with</h4>
-            <FaGoogle onClick={googleLogIn} className='fs-1 text-light rounded-circle mx-auto shadow' />
+            <div className="form-control">
+                <label className="label">
+                    <span className="label-text">Your Password</span>
+                </label>
+                <label className="input-group">
+                    <span className='bg-info'>Password</span>
+                    <input type="password" name='password' placeholder="Your Password" className="input input-bordered w-full" />
+                </label>
+            </div>
+            <div className='my-6'>
+                <input type="submit" value='Login' className='btn btn-info bg-info w-full shadow-lg' />
+            </div>
+            <p className='text-gray-400 text-center'>New here? Please, <Link to='/register' className='text-info link-hover'>register</Link></p>
         </form>
     );
 };
